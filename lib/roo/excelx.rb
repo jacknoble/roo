@@ -509,7 +509,9 @@ class Roo::Excelx < Roo::Base
     validate_sheet!(sheet)
     return if @cells_read[sheet]
     return unless @sheet_doc[sheets.index(sheet)]
-    @sheet_doc[sheets.index(sheet)].xpath("/xmlns:worksheet/xmlns:sheetData/xmlns:row/xmlns:c").each do |c|
+    # @sheet_doc[sheets.index(sheet)].xpath("/xmlns:worksheet/xmlns:sheetData/xmlns:row/xmlns:c").each do |c|
+    @sheet_doc[self.sheets.index(sheet)].remove_namespaces!
+    @sheet_doc[self.sheets.index(sheet)].xpath("/worksheet/sheetData/row/c").each do |c|
       cell = parse_cell(c, sheet: sheet)
       set_cell_values(cell.sheet, cell.coordinate.x, cell.coordinate.y, 0, cell.value, cell.type,
                       cell.formula, cell.excelx_type, cell.excelx_value, cell.s_attribute) unless cell == 0
@@ -767,7 +769,9 @@ Datei xl/comments1.xml
 
   # read the shared strings xml document
   def read_shared_strings(doc)
-    doc.xpath("/xmlns:sst/xmlns:si").each do |si|
+    # doc.xpath("/xmlns:sst/xmlns:si").each do |si|
+    doc.remove_namespaces!
+    doc.xpath("/sst/si").each do |si|
       shared_table_entry = ''
       si.children.each do |elem|
         if elem.name == 'r' and elem.children
